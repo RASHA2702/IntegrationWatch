@@ -35,12 +35,23 @@ public class EndpointProbeWorker : BackgroundService
                 var endpoints = await endpointRepo.GetAllAsync(stoppingToken);
                 var active = endpoints.Where(e => e.Status != EndpointHealthStatus.Paused).ToList();
 
-                foreach (var ep in active)
+                var dueEndpoints = active
+                    .Where(ep => !ep.LastCheckedAtUtc.HasValue || (DateTime.UtcNow - ep.LastCheckedAtUtc.Value).TotalSeconds >= ep.IntervalSeconds)
+                    .ToList();
+
+                if (dueEndpoints.Count > 0)
                 {
-                    if (!ep.LastCheckedAtUtc.HasValue || (DateTime.UtcNow - ep.LastCheckedAtUtc.Value).TotalSeconds >= ep.IntervalSeconds)
+                    var parallelOptions = new ParallelOptions
                     {
-                        await ProbeEndpointAsync(ep, scope.ServiceProvider, stoppingToken);
-                    }
+                        MaxDegreeOfParallelism = 5,
+                        CancellationToken = stoppingToken
+                    };
+
+                    await Parallel.ForEachAsync(dueEndpoints, parallelOptions, async (ep, ct) =>
+                    {
+                        using var innerScope = _scopeFactory.CreateScope();
+                        await ProbeEndpointAsync(ep, innerScope.ServiceProvider, ct);
+                    });
                 }
             }
             catch (Exception ex) when (!stoppingToken.IsCancellationRequested)

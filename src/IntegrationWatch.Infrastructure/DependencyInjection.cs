@@ -4,6 +4,7 @@ using IntegrationWatch.Infrastructure.Alerts;
 using IntegrationWatch.Infrastructure.Background;
 using IntegrationWatch.Infrastructure.Persistence;
 using IntegrationWatch.Infrastructure.Resilience;
+using IntegrationWatch.Infrastructure.Security;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationWatch.Infrastructure;
@@ -13,6 +14,7 @@ public static class DependencyInjection
     public static IServiceCollection AddIntegrationWatchInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<InMemoryWatchStore>();
+        services.AddSingleton<IEndpointUrlValidator, EndpointUrlValidator>();
 
         services.AddScoped<IMonitoredEndpointRepository, MonitoredEndpointRepository>();
         services.AddScoped<IProbeExecutionRepository, ProbeExecutionRepository>();
