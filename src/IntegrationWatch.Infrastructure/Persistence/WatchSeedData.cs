@@ -26,7 +26,7 @@ public static class WatchSeedData
         store.Endpoints[ep2.Id] = ep2;
         store.Endpoints[ep3.Id] = ep3;
 
-        // Generate synthetic latency distributions for ep1 & ep2
+        // Generate sample latency distributions for ep1 & ep2
         var rnd = new Random(42);
         for (int i = 0; i < 40; i++)
         {

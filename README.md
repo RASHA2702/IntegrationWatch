@@ -22,7 +22,7 @@ Modern distributed SaaS applications depend heavily on external webhooks and thi
 ## 2. Intended Users
 - **Backend & Platform Engineers:** Needing synthetic telemetry across critical external microservices and payment gateways.
 - **Site Reliability Engineers (SREs):** Monitoring SLA/SLO uptime and P95/P99 latency trends.
-- **Freelance & Contract Engineers:** Delivering reliable background worker services and resilient integrations for client businesses.
+- **DevOps & Engineering Teams:** Managing external integrations, webhooks, and third-party dependencies.
 
 ---
 
