@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>IntegrationWatch.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0-preview-20220707-01" />
+    <PackageReference Include="Moq" Version="4.18.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\IntegrationWatch.Core\IntegrationWatch.Core.csproj" />
+    <ProjectReference Include="..\..\src\IntegrationWatch.Application\IntegrationWatch.Application.csproj" />
+    <ProjectReference Include="..\..\src\IntegrationWatch.Infrastructure\IntegrationWatch.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/IntegrationWatch.Core/IntegrationWatch.Core.csproj" />
+    <Project Path="src/IntegrationWatch.Application/IntegrationWatch.Application.csproj" />
+    <Project Path="src/IntegrationWatch.Infrastructure/IntegrationWatch.Infrastructure.csproj" />
+    <Project Path="src/IntegrationWatch.Api/IntegrationWatch.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/IntegrationWatch.Tests/IntegrationWatch.Tests.csproj" />
+  </Folder>
+</Solution>

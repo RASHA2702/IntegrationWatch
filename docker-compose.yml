@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  integrationwatch-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: integrationwatch-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5050:5050"
+    restart: unless-stopped
