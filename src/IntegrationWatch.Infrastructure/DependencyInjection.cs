@@ -22,8 +22,11 @@ public static class DependencyInjection
         services.AddScoped<IAlertDispatcher, AlertDispatcher>();
 
         services.AddHttpClient<IResilientHttpClient, ResilientHttpClient>();
+        services.AddHttpClient<IWebhookDispatcher, WebhookDispatcher>();
 
         services.AddScoped<IMetricsCalculator, MetricsCalculator>();
+        services.AddSingleton<ILatencyAnomalyDetector, LatencyAnomalyDetector>();
+        services.AddSingleton<ISlaCalculator, SlaCalculator>();
         services.AddScoped<IEndpointService, EndpointService>();
         services.AddScoped<IIncidentService, IncidentService>();
 

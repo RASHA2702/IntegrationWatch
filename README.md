@@ -1,11 +1,11 @@
 # IntegrationWatch — API & Webhook Resilience Monitoring Platform
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
-[![Tests](https://img.shields.io/badge/tests-27%20passed-success)](#)
+[![Tests](https://img.shields.io/badge/tests-38%20passed-success)](#)
 [![Framework](https://img.shields.io/badge/.NET-8.0%20LTS-purple)](#)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A high-performance synthetic monitoring and integration resilience service designed for modern cloud architectures. Engineered with **C# / .NET 8**, **resilience patterns (transient retries, jittered backoff)**, **SSRF protection**, **Background Services (`IHostedService`)**, and **RFC 9457 ProblemDetails**.
+A high-performance synthetic monitoring and integration resilience service designed for modern cloud architectures. Engineered with **C# / .NET 8**, **resilience patterns (transient retries, jittered backoff)**, **SSRF protection**, **HMAC-SHA256 signed webhooks**, **statistical anomaly detection**, and **RFC 9457 ProblemDetails**.
 
 ---
 
@@ -13,16 +13,17 @@ A high-performance synthetic monitoring and integration resilience service desig
 Modern distributed SaaS applications depend heavily on external webhooks and third-party APIs (Stripe, SendGrid, Twilio, ERPs). When external APIs degrade or fail silently:
 - Customers report checkout errors before engineering teams notice.
 - Transient network glitches cause false-alarm alerts and on-call burnout.
-- Engineering leads lack visibility into true latency distributions (P95 and P99 percentiles).
+- Engineering leads lack visibility into true latency distributions (P95 and P99 percentiles) and subtle degradation anomalies.
 - Vulnerable probing engines expose internal cloud environments to Server-Side Request Forgery (SSRF) and metadata credential theft.
+- External webhook notifications lack cryptographic proof of authenticity, exposing subscriber systems to spoofing attacks.
 
-**IntegrationWatch** continuously runs synthetic probes, mitigates transient blips via exponential backoff retries on transient codes, protects internal infrastructure from SSRF, calculates statistical latency percentiles using the NIST Nearest-Rank method, and manages incident state transitions with automated resolution upon service recovery.
+**IntegrationWatch** continuously runs synthetic probes, mitigates transient blips via exponential backoff retries on transient codes, protects internal infrastructure from SSRF, detects latency degradation via statistical Z-score anomaly modeling, calculates NIST Nearest-Rank percentiles, dispatches HMAC-SHA256 signed webhooks, and manages incident state transitions with automated resolution upon service recovery.
 
 ---
 
 ## 2. Intended Users
 - **Backend & Platform Engineers:** Needing synthetic telemetry across critical external microservices and payment gateways.
-- **Site Reliability Engineers (SREs):** Monitoring SLA/SLO uptime and P95/P99 latency trends.
+- **Site Reliability Engineers (SREs):** Monitoring SLA/SLO uptime, MTTR metrics, and P95/P99 latency trends.
 - **DevOps & Engineering Teams:** Managing external integrations, webhooks, and third-party dependencies.
 
 ---
@@ -32,6 +33,9 @@ Modern distributed SaaS applications depend heavily on external webhooks and thi
 - **Synthetic Probe Scheduler:** Background worker running non-blocking scheduled HTTP probes with controlled concurrency (`Parallel.ForEachAsync`).
 - **Resilience Engine:** Exponential backoff with jitter and linked cancellation token timeouts, selectively retrying only transient errors (408, 429, 500, 502, 503, 504) while failing fast on non-transient 4xx errors.
 - **SSRF Defense:** Automated validation blocking loopback (`127.0.0.1`, `localhost`), link-local / cloud metadata (`169.254.169.254`), and RFC 1918 private subnets (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`).
+- **Cryptographic Webhook Dispatcher:** Signs outbound alert notifications using HMAC-SHA256 (`X-Signature-SHA256`) with constant-time verification to prevent timing attacks and spoofing.
+- **Statistical Latency Anomaly Detection:** Real-time moving baseline and Z-score calculation detecting performance degradation before hard downtime occurs.
+- **SLA & MTTR Reporting:** Calculates availability percentages, Mean Time To Recovery (MTTR), and SLO compliance metrics.
 - **Consecutive Failure Thresholds:** 3-stage health progression (`Healthy` → `Degraded` → `Unhealthy`).
 - **Statistical Latency Telemetry:** Real-time computation of P50 (median), P95, and P99 response time percentiles using NIST Nearest-Rank algorithm.
 - **Incident Lifecycle Management:** Automatically triggers incidents upon threshold breach and auto-resolves when the endpoint recovers.
@@ -133,7 +137,7 @@ The service will start listening on `http://localhost:5050`.
 ## 8. Automated Testing Results
 ```text
 Test run for IntegrationWatch.Tests.dll (.NETCoreApp,Version=v8.0)
-Passed!  - Failed: 0, Passed: 27, Skipped: 0, Total: 27, Duration: 1 s
+Passed!  - Failed: 0, Passed: 38, Skipped: 0, Total: 38, Duration: 1 s
 ```
 - Verified failure threshold transitions (`Healthy` → `Degraded` → `Unhealthy`).
 - Verified percentile mathematics using NIST Nearest-Rank (P50, P95, P99) and boundary conditions.
@@ -142,6 +146,10 @@ Passed!  - Failed: 0, Passed: 27, Skipped: 0, Total: 27, Duration: 1 s
 - Verified SSRF validation blocking private subnets, loopbacks, and cloud metadata (169.254.169.254).
 - Verified resilient client fast-failure on non-transient 4xx errors without redundant retries.
 - Verified transient error retries (503, 429, timeouts) up to max attempts with exponential backoff.
+- Verified HMAC-SHA256 signature generation and constant-time verification against timing attacks.
+- Verified statistical Z-score latency anomaly detection and thresholding.
+- Verified SLA availability percentages and MTTR (Mean Time To Recovery) computations.
+- Verified SSRF guard in WebhookDispatcher preventing webhook abuse.
 
 ---
 
